@@ -11,3 +11,4 @@ Pillow>=10.0.0
 tqdm>=4.65.0
 tensorboard>=2.13.0
 pandas>=2.0.0
+Flask>=3.0.0

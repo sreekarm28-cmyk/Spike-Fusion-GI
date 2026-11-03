@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f4f7f6">
+    <title>SpikeFusion-GI | Image review</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="{{ url_for('static', filename='app.js') }}" defer></script>
+  </head>
+  <body>
+    <div class="page-shell">
+      <nav class="topbar" aria-label="Main navigation">
+        <a class="brand" href="/" aria-label="SpikeFusion-GI home">
+          <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></span>
+          <span>SpikeFusion<span class="brand-light">-GI</span></span>
+        </a>
+        <div class="topbar-actions">
+          <span id="modelStatus" class="status-pill status-loading"><span class="status-dot"></span>Checking model</span>
+          <button id="openAdmin" class="button button-quiet" type="button">Admin settings</button>
+        </div>
+      </nav>
+
+      <main>
+        <section class="hero">
+          <div class="hero-copy">
+            <p class="eyebrow">CAPSULE ENDOSCOPY REVIEW</p>
+            <h1>Review a frame.<br><span>Understand the prediction.</span></h1>
+            <p class="hero-description">Upload an image for a prediction and visual explanation, or review selected frames from a short video.</p>
+            <div class="hero-note"><span class="note-icon" aria-hidden="true">i</span><span>Research prototype. Predictions are not a medical diagnosis.</span></div>
+          </div>
+          <div class="hero-art" aria-hidden="true">
+            <div class="orb orb-one"></div><div class="orb orb-two"></div>
+            <div class="scan-ring ring-one"></div><div class="scan-ring ring-two"></div>
+            <div class="scan-core"><span></span><span></span><span></span><i></i></div>
+            <div class="art-tag tag-top">FRAME ANALYSIS <b>●</b></div>
+            <div class="art-tag tag-bottom">SPIKEFUSION / GI</div>
+          </div>
+        </section>
+
+        <section class="workspace" aria-label="Image and video analysis">
+          <div class="workspace-heading">
+            <div><p class="eyebrow">ANALYSIS WORKSPACE</p><h2>Start with a file</h2></div>
+            <div class="privacy-note"><span class="lock-icon" aria-hidden="true">⌑</span> Files are processed by this local app.</div>
+          </div>
+
+          <div class="mode-tabs" role="tablist" aria-label="Choose upload type">
+            <button class="mode-tab is-active" id="photoTab" type="button" role="tab" aria-selected="true" aria-controls="photoPanel" data-mode="photo"><span class="tab-icon">▧</span> Photo</button>
+            <button class="mode-tab" id="videoTab" type="button" role="tab" aria-selected="false" aria-controls="videoPanel" data-mode="video"><span class="tab-icon">▷</span> Video</button>
+          </div>
+
+          <div id="photoPanel" class="mode-panel" role="tabpanel" aria-labelledby="photoTab">
+            <div class="upload-card">
+              <div class="upload-copy"><span class="step-number">01</span><div><h3>Choose an endoscopy photo</h3><p>JPG or PNG · upload one image at a time</p></div></div>
+              <label class="dropzone" id="photoDropzone" for="photoInput" tabindex="0">
+                <input id="photoInput" class="file-input" type="file" accept="image/jpeg,image/png,.jpg,.jpeg,.png">
+                <span class="upload-icon" aria-hidden="true">↑</span>
+                <span class="drop-title">Drop your image here</span>
+                <span class="drop-subtitle">or <span class="text-link">browse files</span></span>
+                <span id="photoFileName" class="file-name"></span>
+              </label>
+              <div id="photoPreviewWrap" class="preview-wrap is-hidden"><img id="photoPreview" alt="Preview of uploaded endoscopy image"><button id="removePhoto" class="remove-file" type="button" aria-label="Remove selected photo">×</button></div>
+              <div class="upload-footer"><span class="format-hint">Accepted: JPG, JPEG, PNG</span><button id="analyzePhoto" class="button button-primary" type="button" disabled>Analyze image <span aria-hidden="true">→</span></button></div>
+            </div>
+            <div id="photoResult" class="result-card is-hidden" aria-live="polite">
+              <div class="result-heading"><div><p class="eyebrow">MODEL RESULT</p><h3 id="photoPrediction">Prediction</h3></div><div class="confidence-chip"><span>Confidence</span><strong id="photoConfidence">—</strong></div></div>
+              <div class="confidence-track"><span id="photoConfidenceBar"></span></div>
+              <div class="probability-section"><h4>Other model scores</h4><div id="probabilityList" class="probability-list"></div></div>
+              <div class="explanation-heading"><div><p class="eyebrow">VISUAL EXPLANATION</p><h3>What influenced the result</h3></div><span class="cam-tag">Grad-CAM</span></div>
+              <div class="explanation-grid">
+                <figure><img id="resultOriginal" alt="Image seen by the model"><figcaption>Model input</figcaption></figure>
+                <figure><img id="resultHeatmap" alt="Grad-CAM heatmap"><figcaption>Heatmap</figcaption></figure>
+                <figure><img id="resultOverlay" alt="Heatmap overlaid on image"><figcaption>Overlay</figcaption></figure>
+              </div>
+              <p class="explanation-disclaimer">Highlighted regions show areas that influenced the model. They do not confirm a finding.</p>
+            </div>
+          </div>
+
+          <div id="videoPanel" class="mode-panel is-hidden" role="tabpanel" aria-labelledby="videoTab">
+            <div class="upload-card">
+              <div class="upload-copy"><span class="step-number">01</span><div><h3>Choose an endoscopy video</h3><p>MP4, MOV, AVI or MKV · shorter clips are quicker to review</p></div></div>
+              <label class="dropzone" id="videoDropzone" for="videoInput" tabindex="0">
+                <input id="videoInput" class="file-input" type="file" accept="video/mp4,video/quicktime,video/x-msvideo,video/x-matroska,.mp4,.mov,.avi,.mkv">
+                <span class="upload-icon upload-icon-video" aria-hidden="true">▷</span>
+                <span class="drop-title">Drop your video here</span>
+                <span class="drop-subtitle">or <span class="text-link">browse files</span></span>
+                <span id="videoFileName" class="file-name"></span>
+              </label>
+              <div id="videoPreviewWrap" class="video-preview-wrap is-hidden"><video id="videoPreview" controls playsinline></video><button id="removeVideo" class="remove-file" type="button" aria-label="Remove selected video">×</button></div>
+              <div class="upload-footer"><span class="format-hint">Frames are selected by view changes, with regular checks as a fallback.</span><button id="analyzeVideo" class="button button-primary" type="button" disabled>Analyze video <span aria-hidden="true">→</span></button></div>
+              <div id="videoProgress" class="progress-state is-hidden" role="status"><span class="spinner"></span><span>Checking selected frames… This can take a while for long videos.</span></div>
+            </div>
+            <div id="videoResult" class="result-card is-hidden" aria-live="polite">
+              <div class="result-heading"><div><p class="eyebrow">VIDEO REVIEW</p><h3 id="videoResultTitle">Selected frame predictions</h3></div><div class="confidence-chip"><span>Frames checked</span><strong id="framesChecked">0</strong></div></div>
+              <p class="video-result-note">The chart counts frame predictions; it is not a disease probability for the whole video.</p>
+              <div id="videoCounts" class="video-counts"></div>
+              <div id="videoFrames" class="video-frame-list"></div>
+            </div>
+          </div>
+          <div id="message" class="message is-hidden" role="alert"></div>
+        </section>
+
+        <footer class="page-footer"><span>SpikeFusion-GI</span><span>For research review only · Not a clinical diagnosis</span></footer>
+      </main>
+    </div>
+
+    <dialog id="adminDialog" class="admin-dialog" aria-labelledby="adminTitle">
+      <div class="dialog-top"><div><p class="eyebrow">RESTRICTED CONTROLS</p><h2 id="adminTitle">Admin settings</h2></div><button id="closeAdmin" class="icon-button" type="button" aria-label="Close admin settings">×</button></div>
+      <div id="adminLoginView">
+        <p class="dialog-copy">Photo and video uploads are open. Enter the admin passcode to change the active model or frame selection settings.</p>
+        <form id="adminLoginForm" class="admin-form">
+          <label for="adminPassword">Admin passcode</label>
+          <input id="adminPassword" name="password" type="password" autocomplete="current-password" required>
+          <button class="button button-primary button-full" type="submit">Unlock admin controls</button>
+        </form>
+      </div>
+      <div id="adminPanelView" class="is-hidden">
+        <div class="admin-section"><div class="admin-section-title"><span class="step-number">01</span><div><h3>Active model</h3><p id="adminModelStatus">Checking saved model…</p></div></div>
+          <form id="checkpointForm" class="admin-form">
+            <label for="checkpointInput">Upload checkpoint (.pth, .pt, or .zip)</label>
+            <input id="checkpointInput" name="checkpoint" type="file" accept=".pth,.pt,.zip,application/zip" required>
+            <button class="button button-secondary button-full" type="submit">Save and activate model</button>
+          </form>
+        </div>
+        <div class="admin-section"><div class="admin-section-title"><span class="step-number">02</span><div><h3>Video frame selection</h3><p>Adjust how often the app selects frames.</p></div></div>
+          <label class="range-label" for="changeThreshold">View-change sensitivity <output id="changeThresholdValue">12</output></label>
+          <input id="changeThreshold" type="range" min="3" max="40" step="1" value="12">
+          <label class="range-label" for="minGap">Minimum gap <output id="minGapValue">0.8 sec</output></label>
+          <input id="minGap" type="range" min="0.2" max="3" step="0.2" value="0.8">
+          <label class="range-label" for="maxGap">Check at least every <output id="maxGapValue">3 sec</output></label>
+          <input id="maxGap" type="range" min="1" max="10" step="0.5" value="3">
+          <button id="saveSettings" class="button button-secondary button-full" type="button">Save frame settings</button>
+        </div>
+        <button id="adminLogout" class="button button-quiet button-full" type="button">Lock admin controls</button>
+      </div>
+      <p id="adminMessage" class="message is-hidden" role="status"></p>
+    </dialog>
+  </body>
+</html>

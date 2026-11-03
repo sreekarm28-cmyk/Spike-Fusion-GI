@@ -155,6 +155,17 @@ data/kvasir_v2/
 
 ## Usage
 
+### Local upload interface
+
+The interface is built with plain HTML, CSS, and JavaScript; Flask connects the page to the Python model. Before unlocking admin controls, copy `.streamlit/secrets.toml.example` to `.streamlit/secrets.toml` and set your own `APP_PASSWORD`. Photo and video uploads stay open without the passcode; model and frame-selection settings require admin access. The local secrets file is ignored by Git. Install the requirements and start the website:
+
+```bash
+pip install -r requirements.txt
+python app.py
+```
+
+Open `http://127.0.0.1:5000` in your browser. An admin can upload a `.pth`, `.pt`, or PyTorch `.zip` checkpoint. A valid checkpoint is saved locally as `checkpoints/active_model.pth` and loaded automatically on later runs; a new valid upload replaces the active checkpoint. The Photo view classifies one uploaded image and shows a Grad-CAM heatmap. The Video view compares low-resolution versions of nearby frames and sends selected frames to the model when the view changes, with a maximum-time-gap fallback. The model classifies frames one at a time; it is not a video model. Video results show timestamps, labels, and confidence. The summary counts frame predictions; it is not a disease probability for the whole video.
+
 ### 1. Training
 
 ```bash
@@ -281,6 +292,12 @@ SpikeFusion-GI is designed as an **XAI-first** system. Every branch produces int
 
 ```
 spikefusion-gi/
+├── frontend/
+│   ├── static/                   # CSS styles and browser JavaScript
+│   └── templates/                # HTML pages
+├── backend/
+│   ├── __init__.py
+│   └── app.py                    # Flask routes, uploads, and model calls
 ├── configs/
 │   └── config.py                  # Hyperparameters
 ├── models/
@@ -307,7 +324,10 @@ spikefusion-gi/
 ├── train.py                       # Training (SWA, Mixup, CutMix)
 ├── evaluate.py                    # Test evaluation
 ├── infer.py                       # Inference + XAI
+├── checkpoints/                  # Active model checkpoint (shared in this repository)
+├── references/                   # Project reference material
 ├── requirements.txt
+├── app.py                        # Simple command to start the website
 └── README.md
 ```
 

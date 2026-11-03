@@ -26,6 +26,7 @@ data/kvasir_v2/
 .idea/
 *.swp
 *.swo
+.streamlit/secrets.toml
 
 # OS
 .DS_Store

@@ -52,7 +52,8 @@ class SelectiveScanModule(nn.Module):
         ys = []
         for t in range(length):
             h = a[:, t] * h + b[:, t] * u[:, t].unsqueeze(-1)
-            y_t = (C[:, t].unsqueeze(2) * h).sum(dim=-1)
+            # C is shared across channels, so broadcast it over d_inner.
+            y_t = (C[:, t].unsqueeze(1) * h).sum(dim=-1)
             ys.append(y_t)
         y = torch.stack(ys, dim=1)
         y = y + u * self.D.unsqueeze(0).unsqueeze(0)
